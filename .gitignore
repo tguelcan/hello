@@ -9,7 +9,7 @@ node_modules
 /.svelte-kit
 /build
 .idea/
-
+.partykit
 # OS
 .DS_Store
 Thumbs.db

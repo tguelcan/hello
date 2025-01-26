@@ -35,7 +35,7 @@
 </script>
 
 <div bind:this={elemChat}>
-	<ul class="bg-primary">
+	<ul>
 		{#each messages as { role, userId, content, timestamp, state }}
 			<li>{role}: {content}</li>
 		{/each}

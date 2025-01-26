@@ -26,7 +26,7 @@
 
 
 </script>
-<form onsubmit={handleSubmit} bind:this={composer} class="sticky bottom-4 max-w-xl mx-auto">
+<form onsubmit={handleSubmit} bind:this={composer} class="sticky bottom-4 max-w-xl mx-auto mt-4">
 	<label class="input input-bordered flex items-center gap-2 rounded-full">
 		<input type="text" placeholder="Message" class="grow" name="message" disabled={pending}>
 		<button type="submit" class="group">

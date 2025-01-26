@@ -22,7 +22,7 @@
 
 	let pending: boolean = $state(false);
 </script>
-<div class="container">
+<div class="container max-w-2xl">
 	<List bind:ws bind:pending />
 	<Composer bind:ws bind:pending />
 </div>
