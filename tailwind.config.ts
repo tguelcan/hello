@@ -23,7 +23,11 @@ export default {
 			sans: ['Fira Sans', ...fontFamily.sans],
 			serif: ['Lora Variable', ...fontFamily.serif]
 		},
-		extend: {}
+		extend: {
+			colors: {
+				muted: 'oklch(var(--muted) / <alpha-value>)'
+			},
+		}
 	},
 
 
@@ -38,6 +42,7 @@ export default {
 					'base-100': '#06171b',
 					'base-200': '#07181c',
 					'base-300': '#000000',
+					"--muted": "60% 0.0017 248",
 					'--rounded-box': '0.5rem',
 					h1: {
 						'@apply text-4xl font-serif font-light': {}

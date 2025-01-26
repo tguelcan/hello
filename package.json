@@ -52,6 +52,7 @@
 		"express": "^4.21.2",
 		"jsonwebtoken": "^9.0.2",
 		"lucide-svelte": "^0.474.0",
+		"marked": "^15.0.6",
 		"msgpackr": "^1.11.2",
 		"partysocket": "^1.0.3",
 		"tsx": "^4.19.2",
