@@ -14,25 +14,28 @@ export default class Server implements Party.Server {
 			// TODO: JWT SECRET
 			// const issuer = lobby.env.CLERK_ENDPOINT || DEFAULT_CLERK_ENDPOINT;
 			// get token from request query string
-			const token = new URL(request.url).searchParams.get("token") ?? "";
+			const token = new URL(request.url).searchParams.get('token') ?? '';
 			const secret = process.env.JWT_SECRET;
-			const { payload } = await jwt.verify(token, secret) as {payload: { username: string, room: string }};
-			if(!payload) throw new Error("Invalid token")
+			const { payload } = (await jwt.verify(token, secret)) as {
+				payload: { username: string; room: string };
+			};
+			if (!payload) throw new Error('Invalid token');
 			// verify the JWT (in this case using clerk)
 			// const session = await verifyToken(token, { issuer });
 			// pass any information to the onConnect handler in headers (optional)
 			// request.headers.set("X-User-ID", session.sub);
 			// forward the request onwards on onConnect
+			request.headers.set('X-User-Name', payload.username);
 			return request;
 		} catch (e) {
 			// authentication failed!
 			// short-circuit the request before it's forwarded to the party
-			return new Response("Unauthorized", { status: 401 });
+			return new Response('Unauthorized', { status: 401 });
 		}
 	}
 
 	async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
-
+		const username = ctx.request.headers.get('X-User-Name');
 		// A websocket just connected!
 		console.log(
 			`Connected:
@@ -41,22 +44,18 @@ export default class Server implements Party.Server {
   url: ${new URL(ctx.request.url).pathname}`
 		);
 
-		console.log('ctx.env')
-		console.log(ctx.env)
-
 		// let's send a message to the connection
 		// conn.send("hello from server");
 		const response = pack({
 			role: 'assistant',
 			userId: 'server',
-			content: `Welcome ${conn.id} to ${this.room.id}!`,
+			content: `Welcome ${username} to ${this.room.id}!`,
 			timestamp: new Date()
 		});
 
 		const data = await this.room.storage.get('messages');
-		const allData = pack(data)
+		const allData = pack(data);
 		conn.send(allData);
-
 	}
 
 	async onMessage(message: string, sender: Party.Connection) {
@@ -65,16 +64,18 @@ export default class Server implements Party.Server {
 
 		// put to history
 		messages.push(unpack(user));
-		await this.room.storage.put("messages", messages);
+		await this.room.storage.put('messages', messages);
 
 		this.room.broadcast(user);
 
 		const { text, response } = await generateText({
 			model: deepseek('deepseek-chat'),
 			system:
-				'You are a participant in a chat within a community. You are always in a funny mood and occasionally comment on what users write. Ideally, you make funny comments about what they write.',
+				`You are a participant in a chat within a community with many people. You are always in a funny mood and occasionally comment on what users write. Ideally, you make funny comments about what they write. The user you are interacting with is called ${sender.id}`,
 			// Message history - grap last 50 messages
-			messages: messages.map((e) => ({ role: e.role, content: `The user ${sender.id} wrote: ${e.content}` })).slice(0, 50)
+			messages: messages
+				.map((e) => ({ role: e.role, content: `${e.content}` }))
+				.slice(0, 50)
 		});
 
 		const assistant = pack({
@@ -86,7 +87,7 @@ export default class Server implements Party.Server {
 
 		// put to history
 		messages.push(unpack(assistant));
-		await this.room.storage.put("messages", messages);
+		await this.room.storage.put('messages', messages);
 
 		this.room.broadcast(assistant);
 	}
